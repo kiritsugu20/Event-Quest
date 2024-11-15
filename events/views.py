@@ -4,8 +4,11 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from .models import Hall, Booking
+from .models import Appointment
 from django.utils.timezone import datetime
 from datetime import datetime, timedelta
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 
 # Registration View
 def register_view(request):
@@ -133,3 +136,32 @@ def check_availability(request):
         })
 
     return render(request, 'events/CheckAvailability.html')
+
+
+@csrf_exempt
+def submit_appointment(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        phone = request.POST.get('phone')
+        email = request.POST.get('email')
+        address = request.POST.get('address')
+        date = request.POST.get('date')
+        time = request.POST.get('time')
+        purpose = request.POST.get('purpose')
+
+        # Save to the database
+        Appointment.objects.create(
+            name=name,
+            phone=phone,
+            email=email,
+            address=address,
+            date=date,
+            time=time,
+            purpose=purpose
+        )
+        return redirect('view_appointments')
+    return render(request, 'events/ScheduleAppointments.html')
+
+def view_appointments(request):
+    appointments = Appointment.objects.all()
+    return render(request, 'view_appointments.html', {'appointments': appointments})

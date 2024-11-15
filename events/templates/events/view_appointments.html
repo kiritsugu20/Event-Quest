@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Appointments</title>
+</head>
+<body>
+    <h1>Appointments</h1>
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Address</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Purpose</th>
+        </tr>
+        {% for appointment in appointments %}
+        <tr>
+            <td>{{ appointment.name }}</td>
+            <td>{{ appointment.phone }}</td>
+            <td>{{ appointment.email }}</td>
+            <td>{{ appointment.address }}</td>
+            <td>{{ appointment.date }}</td>
+            <td>{{ appointment.time }}</td>
+            <td>{{ appointment.purpose }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

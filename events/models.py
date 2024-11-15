@@ -20,3 +20,15 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"{self.hall.name} booked by {self.name} on {self.date} at {self.time}"
+
+class Appointment(models.Model):
+    name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=15)
+    email = models.EmailField()
+    address = models.TextField()
+    date = models.DateField()
+    time = models.TimeField()
+    purpose = models.TextField()
+
+    def __str__(self):
+        return f"Appointment with {self.name} on {self.date} at {self.time}"
