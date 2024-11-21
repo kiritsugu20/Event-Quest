@@ -9,6 +9,8 @@ from django.utils.timezone import datetime
 from datetime import datetime, timedelta
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import send_mail
+from django.conf import settings
 
 # Registration View
 def register_view(request):
@@ -86,6 +88,11 @@ def hall_booking(request):
             purpose=purpose
         )
 
+        subject = f"Hall Booking Confirmation for {hall.name}"
+        message = f"Dear {name},\n\nYour booking for {hall.name} on {date} at {time} is confirmed.\n\nThank you!"
+        recipient_list = [email]
+        send_mail(subject, message, settings.EMAIL_HOST_USER, recipient_list)
+
         return redirect('check_availability')  # Redirect to check availability page after booking
 
     halls = Hall.objects.all()
@@ -149,7 +156,6 @@ def submit_appointment(request):
         time = request.POST.get('time')
         purpose = request.POST.get('purpose')
 
-        # Save to the database
         Appointment.objects.create(
             name=name,
             phone=phone,
@@ -159,6 +165,12 @@ def submit_appointment(request):
             time=time,
             purpose=purpose
         )
+
+        subject = f"Appointment Confirmation for {date} at {time}"
+        message = f"Dear {name},\n\nYour appointment on {date} at {time} has been successfully booked.\n\nThank you!"
+        recipient_list = [email]
+        send_mail(subject, message, settings.EMAIL_HOST_USER, recipient_list)
+        
         return redirect('view_appointments')
     return render(request, 'events/ScheduleAppointments.html')
 
