@@ -1,5 +1,14 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
+
+class CustomUser(AbstractUser):
+    phone = models.CharField(max_length=15, blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.username
+    
 class Hall(models.Model):
     name = models.CharField(max_length=100)
     location = models.CharField(max_length=200, blank=True, null=True)  # Optional
