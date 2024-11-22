@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login , logout
 from .models import Hall, Booking
 from .models import Appointment
 from django.utils.timezone import datetime
@@ -61,6 +61,11 @@ def login_view(request):
             return redirect('login')
 
     return render(request, 'events/LoginPage.html')
+
+def logout_view(request):
+    logout(request)  # Log the user out
+    messages.success(request, "You have been logged out successfully.")
+    return redirect('homepage')
 
 # Homepage View
 def homepage(request):
