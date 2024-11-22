@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
@@ -11,6 +11,8 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+User = get_user_model()
 
 # Registration View
 def register_view(request):
@@ -19,6 +21,8 @@ def register_view(request):
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirmPassword')
         email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        address = request.POST.get('address')
 
         # Basic validation
         if password != confirm_password:
@@ -30,7 +34,7 @@ def register_view(request):
 
         try:
             # Create a new user
-            user = User.objects.create_user(username=username, password=password, email=email)
+            user = User.objects.create_user(username=username, password=password, email=email, phone=phone, address=address)
             user.save()
             messages.success(request, "Registration successful! Please log in.")
             return redirect('login')
@@ -41,6 +45,7 @@ def register_view(request):
     return render(request, 'events/RegistrationForm.html')
 
 # Login View
+
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -177,3 +182,25 @@ def submit_appointment(request):
 def view_appointments(request):
     appointments = Appointment.objects.all()
     return render(request, 'view_appointments.html', {'appointments': appointments})
+
+
+
+@login_required
+def view_profile(request):
+
+    user = request.user
+
+    username = user.username
+    email = user.email
+    phone = user.phone
+    address = user.address
+
+    context = {
+        'user': user,
+        'username': username,
+        'email': email,
+        'phone': phone,
+        'address': address,
+    }
+
+    return render(request, 'View_Profile.html', context)
