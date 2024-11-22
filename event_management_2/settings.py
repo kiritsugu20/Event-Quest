@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'events',
 ]
 AUTH_USER_MODEL = 'events.CustomUser' 
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

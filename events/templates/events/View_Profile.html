@@ -120,12 +120,14 @@
 
         <div class="profile-section">
             <div class="profile-pic">
-                <!-- Placeholder for profile picture -->
-                <img src="default-avatar.png" alt="Profile Picture">
+                <img src="{{ user.profile_picture.url }}" alt="Profile Picture">
             </div>
             <div>
-                <label for="profile-pic-upload" class="upload-btn">Upload Picture</label>
-                <input type="file" id="profile-pic-upload" style="display: none;">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <label for="profile-pic-upload" class="upload-btn">Upload Picture</label>
+                    <input type="file" id="profile-pic-upload" name="profile_picture" style="display: none;" onchange="this.form.submit();">
+                </form>
             </div>
         </div>
 

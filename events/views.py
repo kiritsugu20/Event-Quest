@@ -190,6 +190,15 @@ def view_profile(request):
 
     user = request.user
 
+    if request.method == 'POST':
+        profile_picture = request.FILES.get('profile_picture')
+        if profile_picture:
+            user.profile_picture = profile_picture
+            user.save()
+            messages.success(request, "Profile picture updated successfully.")
+        else:
+            messages.error(request, "Please select a picture to upload.")
+
     username = user.username
     email = user.email
     phone = user.phone
