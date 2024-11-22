@@ -39,8 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'events',
 ]
-AUTH_USER_MODEL = 'events.CustomUser' 
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
