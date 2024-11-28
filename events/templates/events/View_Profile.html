@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Profile</title>
+    {% load static %}
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,11 +22,24 @@
             background: #ffffff;
             border-radius: 10px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
         h1 {
             text-align: center;
             color: #28a745;
+        }
+
+        .homepage-icon {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .homepage-icon img {
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
         }
 
         .profile-section {
@@ -116,6 +131,11 @@
 </head>
 <body>
     <div class="container">
+        <!-- Homepage Icon -->
+        <a href="{% url 'homepage' %}" class="homepage-icon" title="Go to Homepage">
+            <img src="{% static 'css/assets/home-icon.png' %}" alt="Homepage Icon">
+        </a>
+
         <h1>Customer Profile</h1>
 
         <div class="profile-section">
