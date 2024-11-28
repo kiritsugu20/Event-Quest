@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Appointments</title>
+    {% load static %}
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -49,6 +51,17 @@
         td {
             color: #555;
         }
+        .homepage-icon {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .homepage-icon img {
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+        }
 
         @media (max-width: 768px) {
             table {
@@ -62,6 +75,9 @@
     </style>
 </head>
 <body>
+    <a href="{% url 'homepage' %}" class="homepage-icon" title="Go to Homepage">
+        <img src="{% static 'css/assets/home-icon.png' %}" alt="Homepage Icon">
+    </a>
     <h1>Appointments</h1>
     <table>
         <tr>
