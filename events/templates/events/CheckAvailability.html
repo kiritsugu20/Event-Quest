@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Check Available Halls</title>
+    {% load static %}
+
     <style>
         /* Global Styles */
         body {
@@ -117,12 +119,26 @@
             margin-top: 10px;
             text-align: center;
         }
+        .homepage-icon {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .homepage-icon img {
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="container">
+        <a href="{% url 'homepage' %}" class="homepage-icon" title="Go to Homepage">
+            <img src="{% static 'css/assets/home-icon.png' %}" alt="Homepage Icon">
+        </a>
         <h1>Check Available Halls</h1>
 
         <form action="{% url 'check_availability' %}" method="POST">
