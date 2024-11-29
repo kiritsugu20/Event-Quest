@@ -24,24 +24,49 @@ def register_view(request):
         phone = request.POST.get('phone')
         address = request.POST.get('address')
 
-        # Basic validation
+        if not username:
+            messages.error(request, "Username is required.")
+            return redirect('register')
+
+        if not email:
+            messages.error(request, "Email is required.")
+            return redirect('register')
+
+        if not password:
+            messages.error(request, "Password is required.")
+            return redirect('register')
+
         if password != confirm_password:
             messages.error(request, "Passwords do not match.")
             return redirect('register')
+
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username already exists.")
             return redirect('register')
 
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "An account with this email already exists.")
+            return redirect('register')
+
         try:
-            # Create a new user
-            user = User.objects.create_user(username=username, password=password, email=email, phone=phone, address=address)
-            user.save()
+            # Create the user
+            user = User.objects.create_user(
+                username=username,
+                password=password,
+                email=email
+            )
+            user.profile.phone = phone  # Assuming `Profile` is linked via OneToOneField
+            user.profile.address = address
+            user.profile.save()
+
             messages.success(request, "Registration successful! Please log in.")
             return redirect('login')
+
         except Exception as e:
             messages.error(request, f"Error occurred: {str(e)}")
             return redirect('register')
 
+    # Render the form for GET request
     return render(request, 'events/RegistrationForm.html')
 
 # Login View
@@ -74,6 +99,7 @@ def homepage(request):
 #Hall Booking view
 def hall_booking(request):
     if request.method == 'POST':
+        errors = {}
         hall_name = request.POST.get('hall_name')
         name = request.POST.get('name')
         email = request.POST.get('email')
@@ -82,6 +108,34 @@ def hall_booking(request):
         time = request.POST.get('time')
         duration = request.POST.get('duration')
         purpose = request.POST.get('purpose')
+
+        if not hall_name:
+            errors['hall_name'] = "Please select a hall."
+        if not name:
+            errors['name'] = "Your name is required."
+        if not email:
+            errors['email'] = "Email is required."
+        if not phone:
+            errors['phone'] = "Phone number is required."
+        if not date:
+            errors['date'] = "Booking date is required."
+        if not time:
+            errors['time'] = "Booking time is required."
+        if not duration:
+            errors['duration'] = "Duration is required."
+        elif int(duration) < 1 or int(duration) > 24:
+            errors['duration'] = "Duration must be between 1 and 24 hours."
+        if not purpose:
+            errors['purpose'] = "Purpose of booking is required."
+
+        # If errors, render form with errors
+        if errors:
+            halls = Hall.objects.all()
+            return render(request, 'events/HallBooking.html', {
+                'halls': halls,
+                'errors': errors,
+                'form_data': request.POST
+            })
         
         # Fetch hall instance
         hall = Hall.objects.get(id=hall_name)
