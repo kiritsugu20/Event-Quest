@@ -85,16 +85,25 @@
       </p>
       <form method="POST" action="{% url 'login' %}">
         {% csrf_token %}
+        
         <label for="username">Enter Username</label>
-        <input type="text" id="username" name="username" required>
-        <span class="error" id="usernameError"></span>
-
+        <input type="text" id="username" name="username" value="{{ request.POST.username|default_if_none:'' }}">
+        {% if errors.username %}
+            <span class="error">{{ errors.username }}</span>
+        {% endif %}
+    
         <label for="password">Enter Password</label>
-        <input type="password" id="password" name="password" required>
-        <span class="error" id="passwordError"></span>
-
+        <input type="password" id="password" name="password">
+        {% if errors.password %}
+            <span class="error">{{ errors.password }}</span>
+        {% endif %}
+    
+        {% if errors.general %}
+            <span class="error">{{ errors.general }}</span>
+        {% endif %}
+    
         <button type="submit">Submit</button>
-      </form>
+    </form>
       <a href="{% url 'register' %}" class="register-link">Click Here to Register yourself</a>
     </div>
   </div>

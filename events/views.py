@@ -22,49 +22,64 @@ def register_view(request):
         confirm_password = request.POST.get('confirmPassword')
         email = request.POST.get('email')
         phone = request.POST.get('phone')
+        dob = request.POST.get('dob')
         address = request.POST.get('address')
 
-        if not username:
-            messages.error(request, "Username is required.")
-            return redirect('register')
+        errors = {}  # Dictionary to store error messages
 
+        # Validation checks
+        if not username:
+            errors['username'] = "Username is required."
+        
         if not email:
-            messages.error(request, "Email is required.")
-            return redirect('register')
+            errors['email'] = "Email is required."
 
         if not password:
-            messages.error(request, "Password is required.")
-            return redirect('register')
-
+            errors['password'] = "Password is required."
+        
         if password != confirm_password:
-            messages.error(request, "Passwords do not match.")
-            return redirect('register')
+            errors['confirmPassword'] = "Passwords do not match."
+
+        if not phone:
+            errors['phone'] = "phone no. is required."
+
+        if not address:
+            errors['address'] = "address cannot be left empty"
+        
+        if not dob:
+            errors['dob'] = "dob cannot be left empty"
 
         if User.objects.filter(username=username).exists():
-            messages.error(request, "Username already exists.")
-            return redirect('register')
+            errors['username'] = "Username already exists."
 
         if User.objects.filter(email=email).exists():
-            messages.error(request, "An account with this email already exists.")
-            return redirect('register')
+            errors['email'] = "An account with this email already exists."
+
+        # If there are errors, return the form with the errors
+        if errors:
+            return render(request, 'events/RegistrationForm.html', {'errors': errors})
 
         try:
             # Create the user
             user = User.objects.create_user(
                 username=username,
                 password=password,
-                email=email
+                email=email,
+                phone=phone,
+                address=address,
+                dob=dob
             )
-            user.profile.phone = phone  # Assuming `Profile` is linked via OneToOneField
-            user.profile.address = address
-            user.profile.save()
 
-            messages.success(request, "Registration successful! Please log in.")
-            return redirect('login')
+            subject = f"Succefully Registered!, Your username is {user.username}"
+            message = f"Succefully Registered!, Your username is {user.username}, Hope you enjoy using our Website."
+            recipient_list = [email]
+            send_mail(subject, message, settings.EMAIL_HOST_USER, recipient_list)
+
+            return redirect('login')  # Redirect after successful registration
 
         except Exception as e:
-            messages.error(request, f"Error occurred: {str(e)}")
-            return redirect('register')
+            errors['general'] = f"Error occurred: {str(e)}"
+            return render(request, 'events/RegistrationForm.html', {'errors': errors})
 
     # Render the form for GET request
     return render(request, 'events/RegistrationForm.html')
@@ -72,20 +87,29 @@ def register_view(request):
 # Login View
 
 def login_view(request):
+    errors = {} 
+
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
 
-        if user is not None:
-            login(request, user)
-            messages.success(request, "Login successful!")
-            return redirect('homepage')  # Redirect to homepage after login
-        else:
-            messages.error(request, "Invalid username or password.")
-            return redirect('login')
+        # Validate inputs
+        if not username:
+            errors['username'] = "Username is required."
 
-    return render(request, 'events/LoginPage.html')
+        if not password:
+            errors['password'] = "Password is required."
+
+        if not errors:  # Only proceed if no validation errors
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, "Login successful!")
+                return redirect('homepage')  # Redirect to homepage after login
+            else:
+                errors['general'] = "Invalid username or password."
+
+    return render(request, 'events/LoginPage.html', {'errors': errors})
 
 def logout_view(request):
     logout(request)  # Log the user out
@@ -212,6 +236,7 @@ def check_availability(request):
 @csrf_exempt
 def submit_appointment(request):
     if request.method == 'POST':
+        errors = {}
         name = request.POST.get('name')
         phone = request.POST.get('phone')
         email = request.POST.get('email')
@@ -220,6 +245,27 @@ def submit_appointment(request):
         time = request.POST.get('time')
         purpose = request.POST.get('purpose')
 
+        if not name:
+            errors['name'] = "Name field cannot be left empty"
+        if not phone:
+            errors['phone'] = "Phone number is required."
+        if not email:
+            errors['email'] = "Email is required."
+        if not address:
+            errors['address'] = "Address is required."
+        if not date:
+            errors['date'] = "Appointment date is required."
+        if not time:
+            errors['time'] = "Appointment time is required."
+        if not purpose:
+            errors['purpose'] = "Purpose of appointment is required."
+
+        # If errors exist
+        if errors:
+            return render(request, 'events/ScheduleAppointments.html', {
+                'errors': errors,
+                'form_data': request.POST,
+            })
         Appointment.objects.create(
             name=name,
             phone=phone,
@@ -236,7 +282,10 @@ def submit_appointment(request):
         send_mail(subject, message, settings.EMAIL_HOST_USER, recipient_list)
         
         return redirect('view_appointments')
-    return render(request, 'events/ScheduleAppointments.html')
+    return render(request, 'events/ScheduleAppointments.html', {
+        'form_data': {}, 
+        'errors': {}      
+    })
 
 def view_appointments(request):
     appointments = Appointment.objects.all()
